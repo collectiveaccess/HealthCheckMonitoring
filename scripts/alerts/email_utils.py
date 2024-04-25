@@ -20,7 +20,6 @@ def send_email(subject, body, sender_email, receiver_email):
     ) as server:
         server.login(sender_email, os.environ.get("EMAIL_PASSWORD"))
         server.sendmail(sender_email, receiver_email, msg.as_string())
-    print("Message sent.")
 
 
 def send_status_down_email(project):

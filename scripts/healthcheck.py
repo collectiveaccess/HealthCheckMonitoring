@@ -24,12 +24,24 @@ def update_statuses():
 
 def success_handler(project):
     db_utils.create_status(project["id"], 1, None)
+    db_utils.update_project(project["id"], 1)
 
 
 def error_handler(project, error_message):
+    # TODO: determines on when to send alerts. do we send separate alerts for
+    # each project?
+
+    print(f'{project["name"]} failed healthcheck')
     db_utils.create_status(project["id"], 0, error_message)
-    email_utils.send_status_down_email(project)
-    slack.post_status_down_message(project)
+    db_utils.update_project(project["id"], 0)
+
+    # TODO: how often do we send notifications?
+    # send alert notifications once per crash
+    if project['status'] == 1 or project['status'] is None:
+        email_utils.send_status_down_email(project)
+        slack.post_status_down_message(project)
+        print('notifications sent')
+
 
 
 update_statuses()

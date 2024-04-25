@@ -1,3 +1,4 @@
+# TODO: is there a better database to use?
 import sqlite3
 from pathlib import Path
 import os
@@ -14,7 +15,8 @@ cur.execute("""
     CREATE TABLE IF NOT EXISTS projects (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name STRING NOT NULL,
-    url STRING NOT NULL
+    url STRING NOT NULL,
+    status INTEGER
     )""")
 
 cur.execute("""
