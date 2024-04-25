@@ -1,6 +1,7 @@
 import requests
 import db_utils
 import alerts.email_utils as email_utils
+import alerts.slack as slack
 
 OK_MESSAGE = "status=happy"
 
@@ -28,6 +29,7 @@ def success_handler(project):
 def error_handler(project, error_message):
     db_utils.create_status(project["id"], 0, error_message)
     email_utils.send_status_down_email(project)
+    slack.post_status_down_message(project)
 
 
 update_statuses()
