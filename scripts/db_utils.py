@@ -11,6 +11,7 @@ def dict_factory(cursor, row):
     fields = [column[0] for column in cursor.description]
     return {key: value for key, value in zip(fields, row)}
 
+
 # TODO: how long should we store the statuses?
 def create_status(project_id, status, error_message=None):
     con = sqlite3.connect(db_path)
@@ -51,6 +52,7 @@ def create_project(name, url):
     cur = con.cursor()
     cur.execute("INSERT INTO projects (name, url) VALUES(?, ?)", [name, url])
     con.commit()
+
 
 def update_project(id, status):
     con = sqlite3.connect(db_path)

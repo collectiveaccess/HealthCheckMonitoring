@@ -37,11 +37,10 @@ def error_handler(project, error_message):
 
     # TODO: how often do we send notifications?
     # send alert notifications once per crash
-    if project['status'] == 1 or project['status'] is None:
+    if project["status"] == 1 or project["status"] is None:
         email_utils.send_status_down_email(project)
         slack.post_status_down_message(project)
-        print('notifications sent')
-
+        print("notifications sent")
 
 
 update_statuses()

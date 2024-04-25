@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def send_email(subject, body, sender_email, receiver_email):
     msg = EmailMessage()
     msg["Subject"] = subject
