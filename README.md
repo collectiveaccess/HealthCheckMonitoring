@@ -33,3 +33,12 @@ Run script to retrieve and store healthcheck status and send notifications. This
 ```bash
 python scripts/healthcheck.py
 ```
+
+## Other
+
+We are using `ruff` to lint and format the python scripts
+
+```bash
+ruff format ./scripts
+ruff check ./scripts
+```
