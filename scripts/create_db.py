@@ -16,7 +16,14 @@ cur.execute("""
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name STRING NOT NULL,
     url STRING NOT NULL,
-    status INTEGER
+    notes TEXT,
+    client_name STRING NOT NULL,
+    cluster_name STRING NOT NULL,
+    status INTEGER,
+    slack_alert INTEGER NOT NULL,
+    email_alert INTEGER NOT NULL,
+    check_frequency INTEGER NOT NULL,
+    created_at TEXT NOT NULL DEFAULT current_timestamp
     )""")
 
 cur.execute("""
@@ -28,5 +35,17 @@ cur.execute("""
     created_at TEXT NOT NULL DEFAULT current_timestamp,
     FOREIGN KEY (project_id) REFERENCES projects (id)
     )""")
+
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS contacts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER,
+    type string NOT NULL,
+    value string NOT NULL,
+    created_at TEXT NOT NULL DEFAULT current_timestamp,
+    FOREIGN KEY (project_id) REFERENCES projects (id),
+    UNIQUE(project_id, type, value) ON CONFLICT IGNORE
+    )""")
+
 
 con.commit()

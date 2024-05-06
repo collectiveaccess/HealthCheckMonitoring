@@ -1,0 +1,4 @@
+url,type,value
+https://princeton.whirlihost.com/admin/hc/,email,princeton1@example.com
+https://princeton.whirlihost.com/admin/hc/,email,princeton2@example.com
+https://princeton.whirlihost.com/admin/hc/,slack,https://hooks.slack.com/services/123

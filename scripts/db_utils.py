@@ -43,14 +43,37 @@ def fetch_project(url):
     con = sqlite3.connect(db_path)
     con.row_factory = dict_factory
     cur = con.cursor()
-    cur.execute("SELECT id FROM projects WHERE url = ?", [url])
-    con.commit()
+    res = cur.execute("SELECT * FROM projects WHERE url = ?", [url])
+    return res.fetchone()
 
 
-def create_project(name, url):
+def create_project(
+    name,
+    url,
+    notes,
+    client_name,
+    cluster_name,
+    slack_alert,
+    email_alert,
+    check_frequency,
+):
     con = sqlite3.connect(db_path)
     cur = con.cursor()
-    cur.execute("INSERT INTO projects (name, url) VALUES(?, ?)", [name, url])
+    cur.execute(
+        """INSERT INTO projects
+        (name, url, notes, client_name, cluster_name, slack_alert, email_alert, check_frequency)
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?)""",
+        [
+            name,
+            url,
+            notes,
+            client_name,
+            cluster_name,
+            slack_alert,
+            email_alert,
+            check_frequency,
+        ],
+    )
     con.commit()
 
 
@@ -58,4 +81,16 @@ def update_project(id, status):
     con = sqlite3.connect(db_path)
     cur = con.cursor()
     cur.execute("UPDATE projects SET status = ? WHERE id = ?", [status, id])
+    con.commit()
+
+
+def create_contact(project_id, type, value):
+    con = sqlite3.connect(db_path)
+    cur = con.cursor()
+    cur.execute(
+        """INSERT INTO contacts
+        (project_id, type, value)
+        VALUES(?, ?, ?)""",
+        [project_id, type, value],
+    )
     con.commit()
