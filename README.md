@@ -21,7 +21,7 @@ name - name of project
 url - url for the healthcheck endpoint
 
 ```bash
-python scripts/populate_db.py.py
+python scripts/populate_db.py
 ```
 
 ## Run scripts
