@@ -2,8 +2,7 @@ import requests
 import db_utils
 import alerts.email_utils as email_utils
 import alerts.slack as slack
-
-OK_MESSAGE = "status=happy"
+import os
 
 
 def update_statuses():
@@ -16,51 +15,52 @@ def update_statuses():
         except Exception as error:
             error_handler(project, error)
         else:
-            if response.text == OK_MESSAGE:
+            # TODO: handle non-CollectiveAccess sites
+            if response.text == "status=happy":
                 success_handler(project)
             else:
                 error_handler(project, response.text)
 
 
 def success_handler(project):
-    db_utils.create_status(project["id"], 1, None)
-    db_utils.update_project(project["id"], 1)
+    current_status = 1
 
     # send notifications when site comes back up
     if project["status"] == 0:
-        handle_notifications(project)
+        handle_notifications(project, current_status)
+
+    db_utils.create_status(project["id"], current_status, None)
+    db_utils.update_project(project["id"], current_status)
 
 
 def error_handler(project, error_message):
-    # TODO: determines on when to send alerts. do we send separate alerts for
-    # each project?
-
     print(f'{project["name"]} failed healthcheck')
-    db_utils.create_status(project["id"], 0, error_message)
-    db_utils.update_project(project["id"], 0)
+    current_status = 0
 
     # send notifications when site is first detected down
     if project["status"] == 1 or project["status"] is None:
-        handle_notifications(project)
+        handle_notifications(project, current_status)
+
+    db_utils.create_status(project["id"], current_status, error_message)
+    db_utils.update_project(project["id"], current_status)
 
 
-def handle_notifications(project):
+def handle_notifications(project, status):
     # handle defaults alerts
-    if project['email_alert'] == 1:
-        email_utils.send_status_down_email(project, os.environ.get("RECEIVER_EMAIL"))
-    if project['slack_alert'] == 1:
-        slack.post_status_down_message(project, os.environ.get("SLACK_WEBHOOK"))
+    if project["email_alert"] == 1:
+        email_utils.send_status_email(project, status, os.environ.get("RECEIVER_EMAIL"))
+    if project["slack_alert"] == 1:
+        slack.post_status_message(project, status, os.environ.get("SLACK_WEBHOOK"))
 
     # handle project specific alerts
-    contacts = db_utils.fetch_project_contacts(project['id'])
+    contacts = db_utils.fetch_project_contacts(project["id"])
     for contact in contacts:
-        if contact['type'] == 'email' and  project['email_alert'] == 1:
-            email_utils.send_status_down_email(project, contact['value'])
-        elif contact['type'] == 'slack' and project['slack_alert'] == 1:
-            slack.post_status_down_message(project, contact['value'])
+        if contact["type"] == "email" and project["email_alert"] == 1:
+            email_utils.send_status_email(project, status, contact["value"])
+        elif contact["type"] == "slack" and project["slack_alert"] == 1:
+            slack.post_status_message(project, status, contact["value"])
 
     print("notifications sent")
-
 
 
 update_statuses()

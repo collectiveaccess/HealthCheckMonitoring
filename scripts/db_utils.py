@@ -35,7 +35,7 @@ def fetch_projects():
     con = sqlite3.connect(db_path)
     con.row_factory = dict_factory
     cur = con.cursor()
-    res = cur.execute("SELECT id, url, name, status from projects;")
+    res = cur.execute("SELECT * from projects;")
     return res.fetchall()
 
 
@@ -46,13 +46,13 @@ def fetch_project(url):
     res = cur.execute("SELECT * FROM projects WHERE url = ?", [url])
     return res.fetchone()
 
+
 def fetch_project_contacts(project_id):
     con = sqlite3.connect(db_path)
     con.row_factory = dict_factory
     cur = con.cursor()
     res = cur.execute("SELECT * FROM contacts WHERE project_id = ?", [project_id])
     return res.fetchall()
-
 
 
 def create_project(

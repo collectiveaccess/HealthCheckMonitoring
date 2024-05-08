@@ -22,10 +22,11 @@ def send_email(subject, body, sender_email, receiver_email):
         server.login(sender_email, os.environ.get("EMAIL_PASSWORD"))
         server.sendmail(sender_email, receiver_email, msg.as_string())
 
-def send_status_down_email(project, reciever_email):
+
+def send_status_email(project, status, reciever_email):
     subject = f'Healthcheck {project["name"]}'
-    body = f'{project["name"]} failed health check. {project["url"]}'
-    send_email(
-        subject, body, os.environ.get("EMAIL_USER"), reciever_email
-    )
-    )
+    if status == 0:
+        body = f'{project["name"]} failed health check. {project["url"]}'
+    else:
+        body = f'{project["name"]} passed health check. {project["url"]}'
+    send_email(subject, body, os.environ.get("EMAIL_USER"), reciever_email)
