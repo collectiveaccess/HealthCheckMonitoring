@@ -66,4 +66,6 @@ venv.bak/
 
 .DS_Store
 data/*.db
+data/*.db-shm
+data/*.db-wal
 data/projects.csv
