@@ -23,14 +23,17 @@ def send_email(subject, body, sender_email, receiver_email):
             server.login(
                 os.environ.get("SMTP_USERNAME"), os.environ.get("SMTP_PASSWORD")
             )
-        except:
-            print("could not login to email server")
+        except Exception as error:
+            print("could not login to email server.", error)
             return
 
         try:
             server.sendmail(sender_email, receiver_email, msg.as_string())
-        except:
-            print("could not send email", sender_email, receiver_email)
+        except Exception as error:
+            print(
+                f"could not send email. sender: {sender_email}, receiver: {receiver_email}.",
+                error,
+            )
 
 
 def send_status_email(project, status, reciever_email):

@@ -1,9 +1,8 @@
 from pathlib import Path
 import sqlite3
 
-data_dir = Path("data")
-db_file = "healthcheck.db"
-db_path = data_dir / db_file
+project_path = Path(__file__).parent.parent
+db_path = Path(project_path, "data", "healthcheck.db")
 
 
 def dict_factory(cursor, row):

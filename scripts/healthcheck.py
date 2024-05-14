@@ -18,8 +18,8 @@ def update_project_status(project_id):
         if project is None:
             print("invalid project_id")
             return
-    except:
-        print("could not connect to database")
+    except Exception as error:
+        print("could not connect to database", error)
         return
 
     try:
