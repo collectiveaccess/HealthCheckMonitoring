@@ -19,17 +19,19 @@ def send_email(subject, body, sender_email, receiver_email):
     with smtplib.SMTP_SSL(
         os.environ.get("SMTP_SERVER"), os.environ.get("SMTP_PORT"), context=context
     ) as server:
-
         try:
-            server.login(os.environ.get("SMTP_USERNAME"), os.environ.get("SMTP_PASSWORD"))
+            server.login(
+                os.environ.get("SMTP_USERNAME"), os.environ.get("SMTP_PASSWORD")
+            )
         except:
-            print('could not login to email server')
+            print("could not login to email server")
             return
 
         try:
             server.sendmail(sender_email, receiver_email, msg.as_string())
         except:
-            print('could not send email', sender_email, receiver_email)
+            print("could not send email", sender_email, receiver_email)
+
 
 def send_status_email(project, status, reciever_email):
     subject = f'Healthcheck {project["name"]}'

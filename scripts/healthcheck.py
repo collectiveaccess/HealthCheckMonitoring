@@ -9,17 +9,17 @@ import os
 def update_all_projects_statuses():
     projects = db_utils.fetch_projects()
     for project in projects:
-        update_project_status(project['id'])
+        update_project_status(project["id"])
 
 
 def update_project_status(project_id):
     try:
         project = db_utils.fetch_project(project_id)
         if project is None:
-            print('invalid project_id')
+            print("invalid project_id")
             return
     except:
-        print('could not connect to database')
+        print("could not connect to database")
         return
 
     try:
@@ -77,8 +77,10 @@ def handle_notifications(project, status):
     print("notifications sent")
 
 
-if __name__ == '__main__':
-  fire.Fire({
-      'update_project_status': update_project_status,
-      'update_all_projects_statuses': update_all_projects_statuses,
-  })
+if __name__ == "__main__":
+    fire.Fire(
+        {
+            "update_project_status": update_project_status,
+            "update_all_projects_statuses": update_all_projects_statuses,
+        }
+    )
