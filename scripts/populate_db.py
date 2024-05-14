@@ -7,7 +7,7 @@ with open(Path("data", "projects.csv")) as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader:
         url = row["url"]
-        project = db_utils.fetch_project(url)
+        project = db_utils.fetch_project_by_url(url)
         if project is None:
             db_utils.create_project(
                 row["name"],
@@ -25,6 +25,6 @@ with open(Path("data", "contacts.csv")) as csv_file:
     csv_reader = csv.DictReader(csv_file)
     for row in csv_reader:
         url = row["url"]
-        project = db_utils.fetch_project(url)
+        project = db_utils.fetch_project_by_url(url)
         if project:
             db_utils.create_contact(project["id"], row["type"], row["value"])

@@ -1,3 +1,4 @@
+import fire
 import requests
 import db_utils
 import alerts.email_utils as email_utils
@@ -5,21 +6,34 @@ import alerts.slack as slack
 import os
 
 
-def update_statuses():
+def update_all_projects_statuses():
     projects = db_utils.fetch_projects()
     for project in projects:
-        try:
-            response = requests.get(project["url"], timeout=5)
-        except requests.exceptions.RequestException as error:
-            error_handler(project, str(error))
-        except Exception as error:
-            error_handler(project, error)
+        update_project_status(project['id'])
+
+
+def update_project_status(project_id):
+    try:
+        project = db_utils.fetch_project(project_id)
+        if project is None:
+            print('invalid project_id')
+            return
+    except:
+        print('could not connect to database')
+        return
+
+    try:
+        response = requests.get(project["url"], timeout=5)
+    except requests.exceptions.RequestException as error:
+        error_handler(project, str(error))
+    except Exception as error:
+        error_handler(project, error)
+    else:
+        # TODO: handle non-CollectiveAccess sites
+        if response.text == "status=happy":
+            success_handler(project)
         else:
-            # TODO: handle non-CollectiveAccess sites
-            if response.text == "status=happy":
-                success_handler(project)
-            else:
-                error_handler(project, response.text)
+            error_handler(project, response.text)
 
 
 def success_handler(project):
@@ -63,4 +77,8 @@ def handle_notifications(project, status):
     print("notifications sent")
 
 
-update_statuses()
+if __name__ == '__main__':
+  fire.Fire({
+      'update_project_status': update_project_status,
+      'update_all_projects_statuses': update_all_projects_statuses,
+  })
