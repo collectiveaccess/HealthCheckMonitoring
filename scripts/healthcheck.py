@@ -4,15 +4,23 @@ import db_utils
 import alerts.email_utils as email_utils
 import alerts.slack as slack
 import os
+import datetime
 
 
 def update_all_projects_statuses():
+    now = datetime.datetime.now()
+    current_minute = now.minute
+
     projects = db_utils.fetch_projects()
     for project in projects:
-        update_project_status(project["id"])
+        if current_minute % project["check_frequency"] == 0:
+            process_project(project)
 
 
 def update_project_status(project_id):
+    now = datetime.datetime.now()
+    current_minute = now.minute
+
     try:
         project = db_utils.fetch_project(project_id)
         if project is None:
@@ -22,6 +30,11 @@ def update_project_status(project_id):
         print("could not connect to database", error)
         return
 
+    if current_minute % project["check_frequency"] == 0:
+        process_project(project)
+
+
+def process_project(project):
     try:
         response = requests.get(project["url"], timeout=5)
     except requests.exceptions.RequestException as error:
