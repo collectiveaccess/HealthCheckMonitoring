@@ -2,6 +2,7 @@ import smtplib
 from email.message import EmailMessage
 import ssl
 import os
+import pandas as pd
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -21,8 +22,46 @@ def send_email(subject, body, sender_email, receiver_email):
     server.ehlo()
     server.login( os.environ.get("SMTP_USERNAME"),  os.environ.get("SMTP_PASSWORD"))
 
+    # holds all emails
+    email_list = set()
+
+    # check for recipient emails in the projects csv, 
+    # split them on space, 
+    # add them to email list and 
+    # make sure to remove duplicated
+
+    # Read the projects.csv file
+    df = pd.read_csv('data/projects.csv')
+
+    # Loop through each row in the DataFrame
+    for index, row in df.iterrows():
+        # Get the recipients from the 'recipients' column
+        recipients = row.get('recipients', '')
+        if recipients:
+            # Split recipients by space 
+            recipients_list = recipients.split()
+            email_list.update(recipients_list)
+
     #for e in config['email_to']:
-    server.sendmail(sender_email, receiver_email, msg.as_string())
+    # Get the RECEIVER_EMAIL environment variable
+    receiver_emails = os.getenv('RECEIVER_EMAIL')
+
+    if receiver_emails:
+        # Split the emails on comma
+        receiver_list = receiver_emails.split(',')
+        
+        email_list.update(receiver_list)
+        
+        # Loop through the list of emails
+        for email in email_list:
+            print(f"Sending email to: {email}")
+            server.sendmail(sender_email, email, msg.as_string())
+    else:
+        print("No RECEIVER_EMAIL environment variable found.")
+    
+    # server.sendmail(sender_email, receiver_email, msg.as_string())
+    
+    # print("send email")
     server.quit()
 
 # def send_email(subject, body, sender_email, receiver_email):
@@ -55,6 +94,7 @@ def send_email(subject, body, sender_email, receiver_email):
 
 
 def send_status_email(project, status, reciever_email):
+    print("send_status_email")
     subject = f'Healthcheck {project["name"]}'
     if status == 0:
         body = f'{project["name"]} failed health check. {project["url"]}'

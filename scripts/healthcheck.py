@@ -8,16 +8,18 @@ import datetime
 
 
 def update_all_projects_statuses():
+    print("update_all_projects_statuses")
     now = datetime.datetime.now()
     current_minute = now.minute
 
     projects = db_utils.fetch_projects()
     for project in projects:
-        if current_minute % project["check_frequency"] == 0:
-            process_project(project)
+        # if current_minute % project["check_frequency"] == 0:
+        process_project(project)
 
 
 def update_project_status(project_id):
+    print("update_project_status")
     now = datetime.datetime.now()
     current_minute = now.minute
 
@@ -35,6 +37,7 @@ def update_project_status(project_id):
 
 
 def process_project(project):
+    print("process_project")
     try:
         response = requests.get(project["url"], timeout=5)
     except requests.exceptions.RequestException as error:
@@ -50,29 +53,32 @@ def process_project(project):
 
 
 def success_handler(project):
+    print("success_handler")
     current_status = 1
 
     # send notifications when site comes back up
-    if project["status"] == 0:
-        handle_notifications(project, current_status)
+    # if project["status"] == 0:
+    handle_notifications(project, current_status)
 
     db_utils.create_status(project["id"], current_status, None)
     db_utils.update_project(project["id"], current_status)
 
 
 def error_handler(project, error_message):
+    print("error_handler")
     print(f'{project["name"]} failed healthcheck')
     current_status = 0
 
     # send notifications when site is first detected down
-    if project["status"] == 1 or project["status"] is None:
-        handle_notifications(project, current_status)
+    # if project["status"] == 1 or project["status"] is None:
+    handle_notifications(project, current_status)
 
     db_utils.create_status(project["id"], current_status, error_message)
     db_utils.update_project(project["id"], current_status)
 
 
 def handle_notifications(project, status):
+    print("handle notifications")
     # handle defaults alerts
     if project["email_alert"] == 1:
         email_utils.send_status_email(project, status, os.environ.get("RECEIVER_EMAIL"))
@@ -89,6 +95,7 @@ def handle_notifications(project, status):
 
     print("notifications sent")
 
+print(os.environ.get("RECEIVER_EMAIL"))
 
 if __name__ == "__main__":
     fire.Fire(
@@ -97,3 +104,4 @@ if __name__ == "__main__":
             "update_all_projects_statuses": update_all_projects_statuses,
         }
     )
+
